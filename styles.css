@@ -1,0 +1,101 @@
+@charset "UTF-8";
+
+body, header, footer, nav, img, main {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+body {
+    background-color: #878787;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.about-container {
+    margin: auto;
+    text-align: center;
+    width: 60%;
+}
+
+.contacts {
+    margin-left: 20px;
+    margin-top: 60px;
+}
+
+.contact-container {
+    display: inline;
+}
+
+.contact-container img {
+    width: 2.5%;
+}
+
+.heading {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.heading h1 {
+    font-size: 2em;
+}
+
+.logo {
+    margin: auto;
+    text-align: center;
+}
+
+.logo img {
+    margin: auto;
+    width: 15%;
+    text-align: center;
+}
+
+.logo p {
+    font-size: 15px;
+    font-style: italic;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.main-container {
+    margin: auto;
+    width: 80%;
+    text-align: center;
+}
+
+.navigation {
+    background-color: #4a4a4a;
+    margin-top: 20px;
+    text-align: center;
+}
+
+.nav-container {
+    background-color: #4a4a4a;
+    color: #878787;
+    display: inline-block;
+    margin: 30px;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.nav-container a {
+    color: #878787;
+    text-decoration: none;
+}
+
+.projects {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.project-container {
+    color: #4a4a4a;
+    display: inline-block;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.project-container img {
+    width: 50%;
+}
