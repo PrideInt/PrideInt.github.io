@@ -13,6 +13,10 @@ function Home() {
             <Helmet>
                 <title>Pride's Lab</title>
                 <meta name="description" content="I'm Pride. This is my lab. I might be looking at some cells under a microscope. Or coding them into this really cool looking website." />
+
+                <link rel="preconnect" href="https://fonts.googleapis.com"/>
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+                <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet"></link>
                 <link rel="icon" type="image/png" href={favicon} sizes="16x16" />
             </Helmet>
 
