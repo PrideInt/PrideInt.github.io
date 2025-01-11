@@ -5,10 +5,10 @@
 }
 
 body {
-  background-color: rgb(46, 46, 46);
+  background-color: rgb(110, 110, 110);
 }
 
-canvas {
+.life {
   position: fixed; /* or absolute */
   top: 0;
   left: 0;

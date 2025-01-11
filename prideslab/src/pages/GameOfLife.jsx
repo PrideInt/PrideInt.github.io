@@ -1,7 +1,9 @@
 import GameOfLifeCSS from './GameOfLife.module.css'
+import favicon from '../assets/shape.png'
 
 import { use, useEffect } from 'react';
 import { useState } from 'react'
+import { Helmet } from 'react-helmet'
 
 const createNewGrid = (grid) => {
   const g = new Array(grid.length);
@@ -94,7 +96,7 @@ function GameOfLife() {
       const canvas = document.getElementById('life');
       const ctx = canvas.getContext('2d');
     
-      ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.02)';
   
       for (let i = 0; i < canvas.width; i += cellSize) {
         ctx.beginPath();
@@ -150,7 +152,7 @@ function GameOfLife() {
       const canvas = document.getElementById('life');
       const ctx = canvas.getContext('2d');
 
-      const fillStyle = 'rgba(255, 255, 255, 0.62)';
+      const fillStyle = 'rgba(36, 36, 36, 0.9)';
       ctx.fillStyle = fillStyle;
 
       if (grid !== undefined && grid.length > 0) {
@@ -204,7 +206,7 @@ function GameOfLife() {
     const canvas = document.getElementById('life');
     const ctx = canvas.getContext('2d');
 
-    const fillStyle = 'rgba(255, 255, 255, 0.62)';
+    const fillStyle = 'rgba(36, 36, 36, 0.9)';
     ctx.fillStyle = fillStyle;
 
     /**
@@ -343,6 +345,12 @@ function GameOfLife() {
 
   return (
     <div>
+      <Helmet>
+        <title>Game of Life</title>
+        <meta name="description" content="Go to Pride's Lab to start up Conway's Game of Life!" />
+        <link rel="icon" type="image/png" href={favicon} sizes="16x16" />
+      </Helmet>
+
       <canvas className={GameOfLifeCSS.life} id="life"></canvas>
     </div>
   )
