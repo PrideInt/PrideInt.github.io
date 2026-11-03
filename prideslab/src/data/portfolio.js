@@ -14,6 +14,7 @@ export const profile = {
 export const links = [
     { label: 'GitHub', href: 'https://github.com/PrideInt' },
     { label: 'Email', href: 'mailto:pyin@prideslab.com' },
+    { label: 'ORCID', href: 'https://orcid.org/0009-0006-5288-2924' }
 ]
 
 export const projects = [
@@ -24,7 +25,7 @@ export const projects = [
             'A movie diary built for going out: log what you watch, keep a watchlist, ' +
             'chat with other users about upcoming releases, and find theaters showing a ' +
             'film on the Movie Map. Co-founded with Amer Issa; I lead development.',
-        tags: ['react', 'firebase', 'vite'],
+        tags: ['react', 'firebase', 'network'],
         links: [
             { label: 'site', href: 'https://cinematd.com' },
             { label: 'code', href: 'https://github.com/Cinematd/Cinematd' },
@@ -37,7 +38,7 @@ export const projects = [
             'An interpretable pharmacogenomics engine that maps star-allele diplotypes for ' +
             'CYP2C19 and CYP2D6 to metabolizer phenotypes and matches them to CPIC ' +
             'recommendations for psychotropic drugs. Educational prototype, not for clinical use.',
-        tags: ['python', 'fastapi', 'pharmacogenomics'],
+        tags: ['python', 'biomedical informatics', 'pharmacogenomics'],
         links: [{ label: 'code', href: 'https://github.com/PrideInt/PGxEngine' }],
     },
     {
@@ -47,7 +48,7 @@ export const projects = [
             'Assembling nucleotide sequences with de Bruijn graphs, following Compeau, ' +
             'Pevzner and Tesler: k-mers become edges, (k-1)-mers become nodes, and the ' +
             'sequence is recovered from an Eulerian path.',
-        tags: ['c#', 'bioinformatics', 'graphs'],
+        tags: ['c#', 'bioinformatics', 'graph theory'],
         links: [{ label: 'code', href: 'https://github.com/PrideInt/DE_BRUIJN_ASSEMBLY' }],
     },
     {
