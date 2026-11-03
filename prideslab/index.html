@@ -9,6 +9,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
   </head>
   <body>
+    <!-- Black until the intro takes over, so the page fades in from black on load -->
+    <div id="boot-cover" style="position:fixed;inset:0;z-index:20;background:#000;animation:boot-fallback .4s ease 6s forwards"></div>
+    <style>@keyframes boot-fallback{to{opacity:0;visibility:hidden}}</style>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

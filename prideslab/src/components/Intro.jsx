@@ -19,6 +19,8 @@ function Intro() {
     const { muted } = useMusic();
 
     useEffect(() => {
+        // The page starts under a black cover (index.html); the intro fades in from black itself
+        document.getElementById('boot-cover')?.remove();
         buttonRef.current?.focus({ preventScroll: true });
         const root = document.documentElement;
         const previous = root.style.overflow;
