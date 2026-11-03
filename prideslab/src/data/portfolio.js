@@ -7,7 +7,7 @@ export const profile = {
         'genome assembly, pharmacogenomics and clinical pathology on one side, ' + 
         'apps and game mods on the way other end of the spectrum. ' + 
         'I used to work in DevOps and AIOps until I pivoted to medicine, biomedical informatics and translational bioinformatics research. ' +
-        'Alongside being a computational biomedicine student, I am also a research consultant for U.S. Botanic Garden\'s Rafflesia conservation project. ' + 
+        'Alongside being a computational biomedicine graduate student, I am also a research consultant for U.S. Botanic Garden\'s Rafflesia conservation project. ' + 
         'All\'s to say, I\'m pretty good at what I do.',
 }
 
@@ -93,7 +93,7 @@ export const research = [
             'Tetrastigma hosts, and non-host relatives from the Philippines and Thailand. Infected ' +
             'hosts shift toward defense and hormone signaling while non-hosts carry more defensive ' +
             'compounds, pointing to chemistry as a gatekeeper of host compatibility.',
-        links: [{ label: 'biorxiv', href: 'https://www.biorxiv.org/content/10.64898/2026.07.19.739411v1' }],
+        links: [{ label: 'biorxiv', href: 'https://www.biorxiv.org/content/10.64898/2026.07.19.739411v1' }, { label: 'pipeline', href: 'https://github.com/PrideInt/RafflesiaMetabolomics2026' }],
     },
 ]
 
@@ -102,6 +102,19 @@ export const about = [
     'moved onto every other language under my belt since then. ' +
     'I love the thrill of not knowing what I can do until I try. ' +
     'I actually wanted to be a filmmaker up until I branched out further academically and figured why not, I\'ll just do what I\'m already good at.',
+]
+
+export const pages = [
+    {
+        title: 'Wishlist',
+        href: 'https://prideslab.com/wishlist',
+        description: 'Wishlist :)',
+    },
+    {
+        title: 'Oscar Picks',
+        href: 'https://prideslab.com/oscars',
+        description: 'My Oscars predictions for the current year.',
+    },
 ]
 
 export const integrations = {

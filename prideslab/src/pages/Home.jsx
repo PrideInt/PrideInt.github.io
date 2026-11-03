@@ -5,9 +5,9 @@ import favicon from '../assets/pl.png'
 import LifeBackground from '../components/LifeBackground'
 import SidePanels from '../components/SidePanels'
 import Typewriter from '../components/Typewriter'
-import { about, links, profile, projects, research } from '../data/portfolio'
+import { about, links, pages, profile, projects, research } from '../data/portfolio'
 
-const sections = ['projects', 'research', 'about', 'contact']
+const sections = ['projects', 'research', 'about', 'more', 'contact']
 
 // The site uses HashRouter, so "#projects" would be read as a route.
 // Scroll to sections in JS instead of using plain anchor links.
@@ -140,6 +140,20 @@ function Home() {
                         <p className={`${Styles.body} ${Styles.hint}`}>
                             There are a couple of lights at the edges of the screen. One plays the music for this site; the other shows what I've been watching lately. You can also push the cells around.
                         </p>
+                    </Typewriter>
+
+                    <Typewriter id="more" className={Styles.section}>
+                        <h2 className={Styles.heading}>More</h2>
+                        <ul className={Styles.moreList}>
+                            {pages.map((page) => (
+                                <li key={page.href}>
+                                    <a className={Styles.moreLink} href={page.href}>
+                                        <span className={Styles.moreTitle}>{page.title} <span className={Styles.moreArrow}>&rarr;</span></span>
+                                        <span className={Styles.moreDescription}>{page.description}</span>
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>
                     </Typewriter>
 
                     <Typewriter id="contact" className={Styles.section}>

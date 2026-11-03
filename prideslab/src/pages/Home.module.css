@@ -290,3 +290,57 @@
     color: var(--faint);
     font-size: 0.9rem;
 }
+
+/* More: links to the other pages on the site */
+
+.moreList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.moreLink {
+    display: grid;
+    gap: 4px;
+    padding: 14px 0;
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px dashed var(--rule);
+}
+
+.moreList li:first-child .moreLink {
+    padding-top: 0;
+}
+
+.moreList li:last-child .moreLink {
+    border-bottom: 0;
+}
+
+.moreTitle {
+    font-weight: 700;
+    font-size: 1.05rem;
+}
+
+.moreArrow {
+    display: inline-block;
+    color: var(--muted);
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.moreDescription {
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+.moreLink:hover .moreTitle,
+.moreLink:focus-visible .moreTitle {
+    text-decoration: underline;
+    text-decoration-color: var(--faint);
+    text-underline-offset: 4px;
+}
+
+.moreLink:hover .moreArrow,
+.moreLink:focus-visible .moreArrow {
+    transform: translateX(4px);
+    color: #fff;
+}
