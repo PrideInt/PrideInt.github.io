@@ -1,0 +1,292 @@
+.home {
+    --text: #ececec;
+    --muted: rgba(255, 255, 255, 0.55);
+    --faint: rgba(255, 255, 255, 0.32);
+    --rule: rgba(255, 255, 255, 0.12);
+    --cell: rgba(255, 255, 255, 0.62); /* same as the live cells */
+
+    color: var(--text);
+    font-family: 'Courier Prime', Courier, monospace;
+    text-align: left;
+}
+
+/* Content column sits above the fixed Game of Life background */
+.page {
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 24px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.page main {
+    flex: 1;
+}
+
+/* Header */
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    padding: 32px 0;
+}
+
+.brand {
+    color: var(--text);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    font-size: 0.95rem;
+}
+
+.nav {
+    display: flex;
+    gap: 20px;
+    font-size: 0.95rem;
+}
+
+.nav a,
+.brand {
+    text-decoration: none;
+}
+
+.nav a {
+    color: var(--muted);
+}
+
+.nav a:hover,
+.brand:hover {
+    color: #fff;
+}
+
+/* Hero */
+
+.hero {
+    padding: 14vh 0 12vh;
+    scroll-margin-top: 0;
+}
+
+.kicker {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 20px;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.cell {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background: var(--cell);
+    animation: blink 1.6s steps(1) infinite;
+}
+
+@keyframes blink {
+    50% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cell { animation: none; }
+}
+
+.title {
+    margin: 0;
+    font-size: clamp(2.4rem, 7vw, 3.6rem);
+    line-height: 1.05;
+    font-weight: 700;
+}
+
+.tagline {
+    margin: 12px 0 0;
+    font-size: 1.15rem;
+    color: var(--text);
+}
+
+.intro {
+    margin: 24px 0 0;
+    max-width: 58ch;
+    color: var(--muted);
+    line-height: 1.7;
+}
+
+.inlineLinks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    list-style: none;
+    margin: 28px 0 0;
+    padding: 0;
+}
+
+.link {
+    color: var(--text);
+    text-decoration: underline;
+    text-decoration-color: var(--faint);
+    text-underline-offset: 4px;
+    transition: text-decoration-color 0.2s, color 0.2s;
+}
+
+.link:hover {
+    color: #fff;
+    text-decoration-color: #fff;
+}
+
+/* Sections */
+
+.section {
+    padding: 48px 0;
+    border-top: 1px solid var(--rule);
+    scroll-margin-top: 16px;
+}
+
+.heading {
+    margin: 0 0 28px;
+    font-size: 0.85rem;
+    font-weight: 400;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.body {
+    margin: 0 0 16px;
+    max-width: 62ch;
+    line-height: 1.7;
+}
+
+/* Projects */
+
+.projects {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.project {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    gap: 0 12px;
+    padding: 22px 0;
+    border-bottom: 1px dashed var(--rule);
+}
+
+.project:first-child {
+    padding-top: 0;
+}
+
+.project:last-child {
+    border-bottom: 0;
+}
+
+.index {
+    color: var(--faint);
+    padding-top: 2px;
+}
+
+.projectHead {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+}
+
+.projectTitle {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.year {
+    color: var(--faint);
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.description {
+    margin: 8px 0 12px;
+    color: var(--muted);
+    line-height: 1.65;
+}
+
+.meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px 20px;
+    font-size: 0.9rem;
+}
+
+.tags {
+    color: var(--faint);
+}
+
+.projectLinks {
+    display: flex;
+    gap: 18px;
+}
+
+/* Footer */
+
+.footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px 24px;
+    padding: 28px 0 40px;
+    border-top: 1px solid var(--rule);
+    color: var(--faint);
+    font-size: 0.85rem;
+}
+
+/* Small screens */
+
+@media (max-width: 560px) {
+    .header {
+        flex-direction: column;
+        gap: 12px;
+        padding: 24px 0;
+    }
+
+    .hero {
+        padding: 8vh 0 10vh;
+    }
+
+    .project {
+        grid-template-columns: 1fr;
+    }
+
+    .index {
+        margin-bottom: 4px;
+    }
+}
+
+/* Research */
+
+.citation {
+    margin: 8px 0 0;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.venue {
+    font-style: italic;
+    color: var(--muted);
+}
+
+.role {
+    margin: -4px 0 12px;
+    font-size: 0.9rem;
+    color: var(--text);
+}
+
+.hint {
+    color: var(--faint);
+    font-size: 0.9rem;
+}

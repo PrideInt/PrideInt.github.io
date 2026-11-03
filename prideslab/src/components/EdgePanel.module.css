@@ -1,0 +1,188 @@
+/* ---------- the resonating light ---------- */
+
+.glow {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    width: 220px;
+    z-index: 2;
+    pointer-events: none;
+    overflow: hidden;
+    --period: 5.5s;
+}
+
+.glow.left { left: 0; }
+.glow.right { right: 0; }
+
+/* soft halo, breathing */
+.glow::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 180px;
+    height: 70vh;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.04) 55%, transparent);
+    transform: translate(-50%, -50%);
+    animation: breathe var(--period) ease-in-out infinite;
+    transition: opacity 0.5s ease;
+}
+
+/* thin line of light on the very edge */
+.glow::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 1px;
+    height: 46vh;
+    background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.55), transparent);
+    transform: translateY(-50%);
+    animation: breathe var(--period) ease-in-out infinite;
+}
+
+.glow.left::before { left: 0; }
+.glow.right::before { left: 100%; }
+.glow.left::after { left: 0; }
+.glow.right::after { right: 0; }
+
+/* rings that ripple outward from the edge */
+.ring {
+    position: absolute;
+    top: 50%;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    transform: translate(-50%, -50%) scale(0.2);
+    opacity: 0;
+    animation: ripple var(--period) ease-out infinite;
+}
+
+.left .ring { left: 0; }
+.right .ring { left: 100%; }
+
+.ringLate {
+    animation-delay: calc(var(--period) / 2);
+}
+
+.right {
+    /* keep the two sides out of step so they feel alive */
+    --phase: 1.3s;
+}
+
+.right::before,
+.right::after,
+.right .ring {
+    animation-delay: var(--phase);
+}
+
+.right .ringLate {
+    animation-delay: calc(var(--phase) + var(--period) / 2);
+}
+
+/* something is playing: resonate a little faster */
+.lively {
+    --period: 3.6s;
+}
+
+.glowOpen::before {
+    opacity: 1;
+    animation-play-state: paused;
+}
+
+.glowOpen .ring {
+    animation: none;
+}
+
+@keyframes breathe {
+    0%, 100% { opacity: 0.45; }
+    50% { opacity: 1; }
+}
+
+@keyframes ripple {
+    0% { transform: translate(-50%, -50%) scale(0.2); opacity: 0; }
+    15% { opacity: 0.55; }
+    100% { transform: translate(-50%, -50%) scale(1.6); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .glow::before,
+    .glow::after,
+    .ring {
+        animation: none;
+    }
+    .glow::before { opacity: 0.8; }
+}
+
+/* ---------- touch / keyboard trigger ---------- */
+
+.trigger {
+    position: fixed;
+    top: 30vh;
+    height: 40vh;
+    width: 22px;
+    z-index: 3;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.trigger.left { left: 0; }
+.trigger.right { right: 0; }
+
+.trigger:focus-visible {
+    outline: 1px solid rgba(255, 255, 255, 0.6);
+    outline-offset: -1px;
+}
+
+/* ---------- the panel ---------- */
+
+.panel {
+    position: fixed;
+    top: 50%;
+    z-index: 4;
+    width: min(320px, calc(100vw - 56px));
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
+    padding: 22px 22px 20px;
+    color: #ececec;
+    font-family: 'Courier Prime', Courier, monospace;
+    text-align: left;
+    background: rgba(10, 10, 10, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 0 80px rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    opacity: 0;
+    visibility: hidden;
+    transition:
+        transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
+        opacity 0.35s ease,
+        visibility 0s linear 0.5s;
+}
+
+.panel.wide {
+    width: min(360px, calc(100vw - 56px));
+}
+
+.panel.left {
+    left: 20px;
+    transform: translate(calc(-100% - 40px), -50%);
+}
+
+.panel.right {
+    right: 20px;
+    transform: translate(calc(100% + 40px), -50%);
+}
+
+.panel.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(0, -50%);
+    transition:
+        transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
+        opacity 0.35s ease,
+        visibility 0s;
+}

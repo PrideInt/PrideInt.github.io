@@ -1,0 +1,92 @@
+/* Same layering as the original Home page, but pinned to the viewport
+   so the effect stays consistent while the content scrolls. */
+
+.background {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background: rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+}
+
+.life {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* Forcefield pulses. They sit above the overlay so they read as light,
+   but stay soft. --size and --duration are set from LifeBackground.jsx. */
+.lights {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+}
+
+.pulse {
+    position: absolute;
+    width: var(--size);
+    height: var(--size);
+    margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+/* the shell of the field: bright edge, clear centre */
+.pulse::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255, 255, 255, 0.55);
+    background: radial-gradient(closest-side, transparent 55%, rgba(255, 255, 255, 0.07) 80%, rgba(255, 255, 255, 0.16));
+    box-shadow:
+        0 0 24px rgba(255, 255, 255, 0.18),
+        inset 0 0 24px rgba(255, 255, 255, 0.1);
+    animation:
+        expand var(--duration) cubic-bezier(0.33, 1, 0.68, 1) forwards, /* ease-out cubic, matched in JS */
+        dissipate 900ms ease-out var(--duration) forwards;
+}
+
+/* a soft flash at the source */
+.pulse::after {
+    content: '';
+    position: absolute;
+    inset: 30%;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(255, 255, 255, 0.35), transparent);
+    animation: flash calc(var(--duration) + 300ms) ease-out forwards;
+}
+
+@keyframes expand {
+    from { transform: scale(0.05); opacity: 1; }
+    to { transform: scale(1); opacity: 0.85; }
+}
+
+@keyframes dissipate {
+    from { transform: scale(1); opacity: 0.85; }
+    to { transform: scale(1.12); opacity: 0; }
+}
+
+@keyframes flash {
+    0% { transform: scale(0.3); opacity: 0; }
+    15% { opacity: 1; }
+    100% { transform: scale(1.4); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pulse::before { animation: fade 900ms ease-out forwards; }
+    .pulse::after { display: none; }
+}
+
+@keyframes fade {
+    from { opacity: 0.8; }
+    to { opacity: 0; }
+}

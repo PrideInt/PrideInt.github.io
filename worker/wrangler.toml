@@ -1,0 +1,9 @@
+name = "prideslab-feeds"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+
+[vars]
+# Your Letterboxd username (the part after letterboxd.com/)
+LETTERBOXD_USER = "pridelightbourn"
+# Sites allowed to read from this worker, comma-separated
+ALLOWED_ORIGINS = "https://www.prideslab.com,https://prideslab.com"

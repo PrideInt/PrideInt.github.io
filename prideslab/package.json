@@ -5,7 +5,9 @@
   "type": "module",
   "homepage": "https://prideslab.com",
   "scripts": {
+    "predev": "node scripts/fetch-letterboxd.mjs",
     "dev": "vite",
+    "prebuild": "node scripts/fetch-letterboxd.mjs",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
