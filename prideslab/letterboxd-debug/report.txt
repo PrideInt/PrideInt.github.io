@@ -1,0 +1,14 @@
+GET https://letterboxd.com/pridelightbourn/rss/ -> 200
+GET https://letterboxd.com/pridelightbourn/ -> 403 (Cloudflare challenge)
+GET https://letterboxd.com/pridelightbourn/films/diary/ -> 403 (Cloudflare challenge)
+banner: not found
+favorites section: not found
+poster components on profile + diary pages: 0
+Creep: using the default poster from the feed
+Godzilla: using the default poster from the feed
+La Bola Negra: using the default poster from the feed
+You Can See Everything: using the default poster from the feed
+GET https://a.ltrbxd.com/resized/film-poster/1/3/0/2/0/3/0/1302030-la-bola-negra-0-600-0-900-crop.jpg?v=d8dd544a16 -> 200
+GET https://a.ltrbxd.com/resized/film-poster/1/7/4/9/2/8/174928-creep-0-600-0-900-crop.jpg?v=d01c2ba3a8 -> 200
+GET https://a.ltrbxd.com/resized/film-poster/9/8/3/3/6/98336-godzilla-0-600-0-900-crop.jpg?v=c1344855a7 -> 200
+GET https://a.ltrbxd.com/resized/film-poster/1/6/2/9/4/4/3/1629443-you-can-see-everything-0-600-0-900-crop.jpg?v=84f6724d74 -> 200

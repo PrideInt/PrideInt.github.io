@@ -4,12 +4,13 @@
  *   GET /letterboxd  the most recent diary entries from the Letterboxd RSS feed
  *
  * Without it, the site uses the copy saved at build time (public/letterboxd.json).
- * With it, the panel updates within 15 minutes of logging a film, no redeploy needed.
+ * With it, the panel's diary updates within about 5 minutes of logging a film, no redeploy needed.
+ * (Banner, favorites and your chosen posters still come from the site's build; see the README.)
  *
  * Vars (wrangler.toml): LETTERBOXD_USER, ALLOWED_ORIGINS
  */
 
-const LETTERBOXD_TTL = 900;   // 15 minutes; diary entries don't change often
+const LETTERBOXD_TTL = 300;   // 15 minutes; diary entries don't change often
 
 export default {
     async fetch(request, env, ctx) {
@@ -82,10 +83,11 @@ async function letterboxd(env) {
                 watchedDate: tag(item, 'letterboxd:watchedDate'),
                 poster: description.match(/<img src="([^"]+)"/)?.[1] ?? null,
                 url: tag(item, 'link'),
+                slug: tag(item, 'link')?.match(/\/film\/([^/]+)\//)?.[1] ?? null,
             };
         })
         .filter(Boolean)
-        .slice(0, 6);
+        .slice(0, 4);
 
     return { profileUrl: `https://letterboxd.com/${user}/`, films };
 }

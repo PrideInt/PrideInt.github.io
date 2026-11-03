@@ -105,11 +105,12 @@ export const about = [
 
 export const integrations = {
     letterboxdUser: 'pridelightbourn',
-    endpoint: '',
+    endpoint: 'https://prideslab-feeds.prideslab.workers.dev',
 
     letterboxdOverrides: {
         banner: '',
         favorites: [],
+        posters: {},
     },
 }
 

@@ -11,10 +11,16 @@
  * Images are downloaded into public/letterboxd/ so the site serves its own copies.
  *
  * If Letterboxd can't be reached, the build keeps going with whatever was saved
- * last time. If the automatic lookup misses your favorites or banner, set them
- * by hand in src/data/portfolio.js (integrations.letterboxdOverrides).
+ * last time. Letterboxd blocks scripts from your profile and diary pages, so
+ * the banner, favorites and chosen posters usually come from
+ * integrations.letterboxdOverrides in src/data/portfolio.js. Fill that in with
+ * scripts/letterboxd-export.js, which runs in your own browser (see that file).
  *
  * This reads a handful of your public pages once per build (about 10 requests).
+ *
+ * Something not showing up? Run this from the prideslab folder:
+ *     node scripts/fetch-letterboxd.mjs --debug
+ * It prints what it found and saves the pages it read into letterboxd-debug/.
  */
 import { mkdir, readdir, rm, writeFile } from 'node:fs/promises';
 
@@ -28,6 +34,10 @@ const user = integrations?.letterboxdUser;
 const overrides = integrations?.letterboxdOverrides ?? {};
 
 const log = (msg) => console.log(`[letterboxd] ${msg}`);
+const DEBUG = process.argv.includes('--debug');
+const debugDir = new URL('letterboxd-debug/', root);
+const report = [];
+const note = (msg) => { report.push(msg); if (DEBUG) log(msg); };
 
 if (!user) {
     log('no letterboxdUser set in portfolio.js; skipping');
@@ -39,6 +49,7 @@ const HEADERS = { 'User-Agent': 'prideslab build (personal portfolio; once per b
 
 const get = async (url, as = 'text') => {
     const res = await fetch(url, { headers: HEADERS, signal: AbortSignal.timeout(12000) });
+    note(`GET ${url} -> ${res.status}${res.headers.get('cf-mitigated') ? ' (Cloudflare challenge)' : ''}`);
     if (!res.ok) throw new Error(`${url} -> HTTP ${res.status}`);
     return as === 'buffer' ? Buffer.from(await res.arrayBuffer()) : res.text();
 };
@@ -76,12 +87,18 @@ function posterComponents(html) {
         const open = block.match(/^<[^>]*>/)[0];
         const img = block.match(/<img\b[^>]*>/)?.[0] ?? '';
         const src = attr(img, 'src');
+        const srcset = attr(img, 'srcset');
+        const best = srcset?.split(',').map((x) => x.trim().split(/\s+/)[0]).pop() || src;
+        const key = attr(open, 'data-cache-busting-key');
+        let posterUrl = attr(open, 'data-poster-url', 'data-resolvable-poster-path', 'data-poster-path', 'data-image-url');
+        if (posterUrl && key && !posterUrl.includes('k=')) posterUrl += `${posterUrl.includes('?') ? '&' : '?'}k=${key}`;
         found.push({
-            slug: attr(open, 'data-film-slug', 'data-item-slug'),
-            name: attr(open, 'data-film-name', 'data-item-name') || attr(img, 'alt'),
+            slug: attr(open, 'data-film-slug', 'data-item-slug', 'data-film-link-slug'),
+            name: attr(open, 'data-film-name', 'data-item-name', 'data-item-full-display-name') || attr(img, 'alt'),
             link: attr(open, 'data-target-link', 'data-item-link', 'data-film-link'),
-            posterUrl: attr(open, 'data-poster-url'),
-            img: src && !/empty-poster/.test(src) ? src : null,
+            posterUrl,
+            img: best && !/empty-poster/.test(best) ? best : null,
+            attrs: [...new Set([...open.matchAll(/\b(data-[\w-]+)=/g)].map((m) => m[1]))],
         });
     }
     return found;
@@ -92,8 +109,16 @@ function posterComponents(html) {
 async function resolvePoster(component) {
     if (component?.img) return component.img;
     const candidates = [];
-    if (component?.posterUrl) candidates.push(absolute(component.posterUrl));
-    if (component?.slug) candidates.push(`${SITE}/ajax/poster/film/${component.slug}/std/150x225/`);
+    if (component?.posterUrl) {
+        const u = absolute(component.posterUrl);
+        candidates.push(u);
+        // a "resolvable poster path" like /film/stalker/ needs the image part added
+        if (/\/film\/[^/]+\/?(\?|$)/.test(u)) candidates.push(u.replace(/\/?(\?|$)/, '/image-150/$1'));
+    }
+    if (component?.slug) {
+        candidates.push(`${SITE}/film/${component.slug}/image-150/`);
+        candidates.push(`${SITE}/ajax/poster/film/${component.slug}/std/150x225/`);
+    }
     for (const url of candidates) {
         try {
             const html = await get(url);
@@ -153,14 +178,21 @@ try {
     try { profileHtml = await get(`${SITE}/${user}/`); } catch (err) { log(`profile page: ${err.message}`); }
     try { diaryHtml = await get(`${SITE}/${user}/films/diary/`); } catch (err) { log(`diary page: ${err.message}`); }
 
-    const banner =
-        overrides.banner ||
-        attr(profileHtml, 'data-backdrop2x', 'data-backdrop') ||
-        profileHtml.match(/class="[^"]*backdrop[^"]*"[^>]*style="[^"]*url\(['"]?([^'")]+)/)?.[1] ||
-        null;
+    const bannerCandidates = [
+        ['data-backdrop attribute', attr(profileHtml, 'data-backdrop2x', 'data-backdrop', 'data-backdrop-retina', 'data-backdrop-mobile')],
+        ['backdrop style', profileHtml.match(/backdrop[^>]*style="[^"]*url\((?:&quot;|['"])?([^'")&]+)/)?.[1]],
+        ['backdrop JSON', profileHtml.match(/"backdrop[\w]*"\s*:\s*"(https?:[^"]+)"/i)?.[1]?.replace(/\\\//g, '/')],
+        ['backdrop-sized image URL', profileHtml.match(/https:\/\/a\.ltrbxd\.com\/resized\/[^"' )]+-(?:1920|1600|1400|1200)-\d+-(?:1080|900|788|675)-\d+-crop[^"' )]*/)?.[0]],
+    ];
+    const foundBanner = bannerCandidates.find(([, url]) => url);
+    note(`banner: ${foundBanner ? `found via ${foundBanner[0]}` : 'not found'}${overrides.banner ? ' (using override)' : ''}`);
+    const banner = overrides.banner || (foundBanner ? decode(foundBanner[1]) : null);
+    const pagesBlocked = !profileHtml && !diaryHtml; // don't keep asking for pages we can't read
 
     const favSection = profileHtml.match(/id="favou?rites"[\s\S]*?<\/section>/)?.[0] ?? '';
     const favComponents = posterComponents(favSection).slice(0, 4);
+    note(`favorites section: ${favSection ? `found, ${favComponents.length} posters` : 'not found'}`);
+    if (favComponents[0]) note(`poster attributes seen: ${favComponents[0].attrs.join(' ')}`);
 
     // slug -> poster component, preferring how it appears on your own pages
     const bySlug = new Map();
@@ -190,9 +222,13 @@ try {
     }
 
     // 5. Diary posters: your chosen poster if we can find it, otherwise the feed's
+    note(`poster components on profile + diary pages: ${bySlug.size}`);
+    const posterOverrides = overrides.posters ?? {};
     const films = await Promise.all(entries.map(async ({ slug, rssPoster, ...film }, i) => {
-        const chosen = slug ? await resolvePoster(bySlug.get(slug) ?? { slug }) : null;
-        return { ...film, poster: await save(chosen || rssPoster, `recent-${i + 1}`) };
+        const manual = posterOverrides[slug] || posterOverrides[film.title];
+        const chosen = manual || (slug && !pagesBlocked ? await resolvePoster(bySlug.get(slug) ?? { slug }) : null);
+        note(`${film.title}: ${manual ? 'your poster (from letterboxdOverrides)' : chosen ? `your poster ${chosen}` : 'using the default poster from the feed'}`);
+        return { ...film, slug, poster: await save(chosen || rssPoster, `recent-${i + 1}`) };
     }));
 
     const data = {
@@ -202,6 +238,8 @@ try {
         banner: await save(banner, 'banner'),
         favorites,
         films,
+        // your chosen posters by film, so live diary entries (from the worker) can use them too
+        posters: posterOverrides,
     };
     await mkdir(publicDir, { recursive: true });
     await writeFile(out, JSON.stringify(data, null, 2) + '\n');
@@ -210,9 +248,26 @@ try {
         .filter((p) => p?.startsWith('letterboxd/')).map((p) => p.slice('letterboxd/'.length)));
     for (const f of await readdir(imageDir)) if (!used.has(f)) await rm(new URL(f, imageDir));
 
+    if (DEBUG) await saveDebug({ profileHtml, diaryHtml, data });
+
     log(`saved ${films.length} recent films, ${favorites.length} favorites, banner: ${data.banner ? 'yes' : 'no'}`);
-    if (!favorites.length) log('no favorites found; you can set them in portfolio.js (letterboxdOverrides.favorites)');
-    if (!data.banner) log('no banner found; you can set one in portfolio.js (letterboxdOverrides.banner)');
+    if (pagesBlocked && (!favorites.length || !data.banner)) {
+        log('Letterboxd blocks scripts from your profile page. To add your banner, favorites and posters,');
+        log('run scripts/letterboxd-export.js in your browser (instructions at the top of that file).');
+    } else {
+        if (!favorites.length) log('no favorites found; you can set them in portfolio.js (letterboxdOverrides.favorites)');
+        if (!data.banner) log('no banner found; you can set one in portfolio.js (letterboxdOverrides.banner)');
+    }
 } catch (err) {
     log(`couldn't fetch from Letterboxd (${err.message}); keeping the existing letterboxd.json`);
+    if (DEBUG) await saveDebug({});
+}
+
+async function saveDebug({ profileHtml = '', diaryHtml = '', data = null }) {
+    await mkdir(debugDir, { recursive: true });
+    await writeFile(new URL('report.txt', debugDir), report.join('\n') + '\n');
+    if (profileHtml) await writeFile(new URL('profile.html', debugDir), profileHtml);
+    if (diaryHtml) await writeFile(new URL('diary.html', debugDir), diaryHtml);
+    if (data) await writeFile(new URL('result.json', debugDir), JSON.stringify(data, null, 2));
+    log(`debug files saved in ${new URL('.', debugDir).pathname}`);
 }
