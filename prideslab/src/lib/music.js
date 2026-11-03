@@ -63,6 +63,7 @@ function getDecks() {
         a.preload = 'auto';
         a.muted = state.muted;
         a.volume = 0;
+        levels.set(a, { to: 0, ms: 0 });
         // Only the active deck drives what the player shows
         a.addEventListener('timeupdate', () => {
             if (a !== current()) return;
@@ -82,39 +83,136 @@ function getDecks() {
     return decks;
 }
 
-// ---------- volume ramps ----------
+// ---------- volume ----------
+//
+// iPhones and iPads ignore a web page's audio volume (it's read-only there), so
+// volume and fades go through the Web Audio API where it exists: each deck feeds
+// a gain node, and fades are scheduled on the audio engine itself (which also
+// keeps them going when the tab isn't in focus). Browsers without Web Audio fall
+// back to the element's own volume.
 
-const ramps = new Map(); // deck -> { frame, resolve }
 // Ears hear loudness on a log scale, so ramp in decibels (-40 dB <-> full)
 // rather than in raw volume, which sounds like it jumps at the quiet end.
 const DB_RANGE = 40;
 const fadeInCurve = (t) => (t <= 0 ? 0 : t >= 1 ? 1 : Math.pow(10, (-DB_RANGE * (1 - t)) / 20));
 const fadeOutCurve = (t) => (t <= 0 ? 0 : t >= 1 ? 1 : 1 - Math.pow(10, (-DB_RANGE * t) / 20));
+const RAMP_STEPS = 32; // a fade is scheduled as this many short straight segments
+
+let audioCtx = null;       // null = not set up yet, false = Web Audio unavailable
+const gains = new Map();   // deck -> GainNode
+const levels = new Map();  // deck -> { from, to, start, ms, curve }; ms 0 = holding steady at `to`
+const ramps = new Map();   // deck -> { cancel }
+
+const clamp01 = (v) => Math.max(0, Math.min(1, v));
+
+// The level a deck is at right now (tracked here so we never rely on
+// browsers reporting scheduled values back correctly)
+function levelOf(a) {
+    const l = levels.get(a);
+    if (!l) return 0;
+    if (!l.ms) return l.to;
+    const t = clamp01((performance.now() - l.start) / l.ms);
+    return l.from + (l.to - l.from) * l.curve(t);
+}
+
+// Set up the Web Audio route. Must first run inside a click or tap (iOS rule),
+// which is why play() and the song switches call it.
+function ensureAudioGraph() {
+    if (audioCtx === null) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) { audioCtx = false; return; }
+        try {
+            audioCtx = new AC();
+            for (const d of getDecks()) {
+                const g = audioCtx.createGain();
+                g.gain.value = levelOf(d);
+                audioCtx.createMediaElementSource(d).connect(g).connect(audioCtx.destination);
+                d.volume = 1; // the gain node does the work now
+                gains.set(d, g);
+            }
+        } catch {
+            audioCtx = false;
+            gains.clear();
+            return;
+        }
+    }
+    if (audioCtx && audioCtx.state !== 'running') audioCtx.resume().catch(() => {});
+}
+
+// Jump straight to a level
+function setLevel(a, v) {
+    cancelRamp(a);
+    levels.set(a, { to: clamp01(v), ms: 0 });
+    const g = gains.get(a);
+    if (g) {
+        const now = audioCtx.currentTime;
+        g.gain.cancelScheduledValues(now);
+        g.gain.setValueAtTime(clamp01(v), now);
+    } else {
+        a.volume = clamp01(v);
+    }
+}
 
 function cancelRamp(a) {
     const r = ramps.get(a);
     if (!r) return;
-    cancelAnimationFrame(r.frame);
     ramps.delete(a);
-    r.resolve(false);
+    r.cancel();
 }
 
-// Ramp a deck's volume to `to` over `ms`. Resolves true when finished, false if interrupted.
+// Fade a deck to `to` over `ms`. Resolves true when finished, false if interrupted.
 function ramp(a, to, ms, curve) {
     cancelRamp(a);
+    const from = levelOf(a);
+    levels.set(a, { from, to, start: performance.now(), ms, curve });
+    const valueAt = (t) => clamp01(from + (to - from) * curve(t));
+
     return new Promise((resolve) => {
-        const from = a.volume;
-        const start = performance.now();
-        const r = { resolve, frame: 0 };
-        ramps.set(a, r);
-        const step = (now) => {
-            // rAF timestamps can be slightly earlier than `start`; clamp to [0, 1]
-            const t = Math.max(0, Math.min(1, (now - start) / ms));
-            a.volume = Math.max(0, Math.min(1, from + (to - from) * curve(t)));
-            if (t < 1) r.frame = requestAnimationFrame(step);
-            else { ramps.delete(a); resolve(true); }
-        };
-        r.frame = requestAnimationFrame(step);
+        const g = gains.get(a);
+        if (g) {
+            // Web Audio: schedule the whole fade up front
+            const now = audioCtx.currentTime;
+            g.gain.cancelScheduledValues(now);
+            g.gain.setValueAtTime(from, now);
+            for (let i = 1; i <= RAMP_STEPS; i++) {
+                g.gain.linearRampToValueAtTime(valueAt(i / RAMP_STEPS), now + (ms / 1000) * (i / RAMP_STEPS));
+            }
+            const timer = setTimeout(() => {
+                ramps.delete(a);
+                levels.set(a, { to, ms: 0 });
+                resolve(true);
+            }, ms);
+            ramps.set(a, {
+                cancel: () => {
+                    clearTimeout(timer);
+                    const v = levelOf(a);
+                    levels.set(a, { to: v, ms: 0 });
+                    const t = audioCtx.currentTime;
+                    g.gain.cancelScheduledValues(t);
+                    g.gain.setValueAtTime(v, t);
+                    resolve(false);
+                },
+            });
+        } else {
+            // Fallback: step the element's own volume every frame
+            const start = performance.now();
+            let frame = 0;
+            const step = (now) => {
+                // rAF timestamps can be slightly earlier than `start`; clamp to [0, 1]
+                const t = clamp01((now - start) / ms);
+                a.volume = valueAt(t);
+                if (t < 1) frame = requestAnimationFrame(step);
+                else { ramps.delete(a); levels.set(a, { to, ms: 0 }); resolve(true); }
+            };
+            frame = requestAnimationFrame(step);
+            ramps.set(a, {
+                cancel: () => {
+                    cancelAnimationFrame(frame);
+                    levels.set(a, { to: a.volume, ms: 0 });
+                    resolve(false);
+                },
+            });
+        }
     });
 }
 
@@ -167,12 +265,13 @@ const startPlayback = (a) => {
 
 export function play() {
     if (!hasMusic) return;
+    ensureAudioGraph();
     const a = current();
     if (state.index < 0) {
         a.src = tracks[startIndex()].url;
         set({ index: startIndex(), time: 0, duration: 0 });
     }
-    a.volume = 0;
+    setLevel(a, 0);
     startPlayback(a);
     ramp(a, config.volume, FADE_MS, fadeInCurve);
 }
@@ -181,7 +280,7 @@ export function pause() {
     switchToken++; // cancel a song change that's fading out or waiting in the gap
     for (const d of getDecks()) {
         cancelRamp(d);
-        if (d !== current()) { d.pause(); d.volume = 0; }
+        if (d !== current()) { d.pause(); setLevel(d, 0); }
     }
     current().pause();
     set({ playing: false, waiting: false });
@@ -196,14 +295,14 @@ const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function switchTo(index) {
     if (!hasMusic) return;
+    ensureAudioGraph();
     const token = ++switchToken;
     const outgoing = current();
     active = 1 - active;
     const incoming = current();
 
-    cancelRamp(incoming);
     incoming.pause();
-    incoming.volume = 0;
+    setLevel(incoming, 0);
     incoming.muted = state.muted;
     incoming.src = tracks[index].url; // starts loading during the fade and gap
     set({ index, time: 0, duration: 0, playing: true });
