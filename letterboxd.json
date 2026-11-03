@@ -1,0 +1,49 @@
+{
+  "profileUrl": "https://letterboxd.com/pridelightbourn/",
+  "user": "pridelightbourn",
+  "fetchedAt": "2026-11-03T05:46:59.632Z",
+  "banner": null,
+  "favorites": [],
+  "films": [
+    {
+      "title": "Creep",
+      "year": "2014",
+      "rating": 2.5,
+      "liked": false,
+      "rewatch": false,
+      "watchedDate": "2026-11-02",
+      "url": "https://letterboxd.com/pridelightbourn/film/creep-2014/",
+      "poster": "letterboxd/recent-1.jpg"
+    },
+    {
+      "title": "Godzilla",
+      "year": "2014",
+      "rating": 2.5,
+      "liked": false,
+      "rewatch": false,
+      "watchedDate": "2026-10-31",
+      "url": "https://letterboxd.com/pridelightbourn/film/godzilla-2014/",
+      "poster": "letterboxd/recent-2.jpg"
+    },
+    {
+      "title": "La Bola Negra",
+      "year": "2026",
+      "rating": 5,
+      "liked": true,
+      "rewatch": true,
+      "watchedDate": "2026-10-23",
+      "url": "https://letterboxd.com/pridelightbourn/film/la-bola-negra/1/",
+      "poster": "letterboxd/recent-3.jpg"
+    },
+    {
+      "title": "You Can See Everything",
+      "year": "2026",
+      "rating": 5,
+      "liked": false,
+      "rewatch": false,
+      "watchedDate": "2026-10-21",
+      "url": "https://letterboxd.com/pridelightbourn/film/you-can-see-everything/",
+      "poster": "letterboxd/recent-4.jpg"
+    }
+  ]
+}
