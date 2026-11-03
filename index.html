@@ -7,10 +7,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
-    <script type="module" crossorigin src="/assets/index-K0xsoy26.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-hqJfmHRq.css">
+    <script type="module" crossorigin src="/assets/index-ExC8xlLU.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-hbSnBUfn.css">
   </head>
   <body>
+    <!-- Black until the intro takes over, so the page fades in from black on load -->
+    <div id="boot-cover" style="position:fixed;inset:0;z-index:20;background:#000;animation:boot-fallback .4s ease 6s forwards"></div>
+    <style>@keyframes boot-fallback{to{opacity:0;visibility:hidden}}</style>
     <div id="root"></div>
   </body>
 </html>
