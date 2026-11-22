@@ -19,8 +19,19 @@ export const links = [
 
 export const projects = [
     {
-        title: 'Cinematd',
+        title: 'CYPGxEngine',
         year: '2026',
+        description:
+            'An interpretable pharmacogenomics engine that maps star-allele diplotypes for ' +
+            'CYP2C19 and CYP2D6 to metabolizer phenotypes and matches them to CPIC ' +
+            'recommendations for psychotropic drugs. Educational prototype for Stony Brook University, ' +
+            'not for clinical use.',
+        tags: ['python', 'biomedical informatics', 'pharmacogenomics'],
+        links: [{ label: 'code', href: 'https://github.com/PrideInt/CYPGxEngine' }],
+    },
+    {
+        title: 'Cinematd',
+        year: '2023 - present',
         description:
             'A movie diary built for going out: log what you watch, keep a watchlist, ' +
             'chat with other users about upcoming releases, and find theaters showing a ' +
@@ -32,28 +43,27 @@ export const projects = [
         ],
     },
     {
-        title: 'PGxEngine',
-        year: '2026',
-        description:
-            'An interpretable pharmacogenomics engine that maps star-allele diplotypes for ' +
-            'CYP2C19 and CYP2D6 to metabolizer phenotypes and matches them to CPIC ' +
-            'recommendations for psychotropic drugs. Educational prototype, not for clinical use.',
-        tags: ['python', 'biomedical informatics', 'pharmacogenomics'],
-        links: [{ label: 'code', href: 'https://github.com/PrideInt/PGxEngine' }],
-    },
-    {
         title: 'De Bruijn Graph Assembly',
         year: '2024',
         description:
             'Assembling nucleotide sequences with de Bruijn graphs, following Compeau, ' +
             'Pevzner and Tesler: k-mers become edges, (k-1)-mers become nodes, and the ' +
-            'sequence is recovered from an Eulerian path.',
-        tags: ['c#', 'bioinformatics', 'graph theory'],
+            'sequence is recovered from an various paths.',
+        tags: ['c', 'complexity', 'computing theory'],
         links: [{ label: 'code', href: 'https://github.com/PrideInt/DE_BRUIJN_ASSEMBLY' }],
     },
     {
+        title: 'MTA Network Graphing and Pathing',
+        year: '2023/2026',
+        description:
+            'Program that takes New York City\'s MTA network data and constructs a graph for ' +
+            'visualizing routes and finding optimal paths between stations.',
+        tags: ['rust', 'algorithms', 'graph theory'],
+        links: [{ label: 'code', href: 'https://github.com/PrideInt/MTApathing' }],
+    },
+    {
         title: 'ProjectKorraSpirits',
-        year: '2025',
+        year: '2022 - present',
         description:
             'A standalone Spirits plugin for ProjectKorra on Minecraft: a spirit world, a ' +
             'boss, spirit items, new abilities, and a developer API for spawning and ' +
@@ -93,7 +103,7 @@ export const research = [
             'Tetrastigma hosts, and non-host relatives from the Philippines and Thailand. Infected ' +
             'hosts shift toward defense and hormone signaling while non-hosts carry more defensive ' +
             'compounds, pointing to chemistry as a gatekeeper of host compatibility.',
-        links: [{ label: 'biorxiv', href: 'https://www.biorxiv.org/content/10.64898/2026.07.19.739411v1' }, { label: 'pipeline', href: 'https://github.com/PrideInt/RafflesiaMetabolomics2026' }],
+        links: [{ label: 'biorxiv', href: 'https://www.biorxiv.org/content/10.64898/2026.07.19.739411v1' }, { label: 'pipeline', href: 'https://github.com/adhitwicaksono/RafflesiaMetabolomics2026' }],
     },
 ]
 
